@@ -23,7 +23,6 @@ export async function sendMessage(message: string): Promise<string> {
       headers: {
         "Content-Type": "application/json",
       },
-      // Use "query" key for the API (can be changed to "message" if needed)
       body: JSON.stringify({ query: message }),
       signal: controller.signal,
     });
@@ -39,12 +38,17 @@ export async function sendMessage(message: string): Promise<string> {
 
     const data: SendMessageResponse = await response.json();
     
-    // Handle different response formats
     return data.response || data.message || "I received your message but couldn't generate a response.";
   } catch (error) {
     if (error instanceof Error) {
       if (error.name === "AbortError") {
         throw new Error("Request timed out. The tutor might be busy. Please try again.");
+      }
+      // Check for CORS/Network errors
+      if (error.message === "Failed to fetch" || error.name === "TypeError") {
+        throw new Error(
+          "Cannot connect to the AI backend. This is likely a CORS issue. Please ensure your backend has CORS enabled (allow-origin: '*')."
+        );
       }
       throw error;
     }
