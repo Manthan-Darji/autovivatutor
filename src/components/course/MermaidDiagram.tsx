@@ -1,9 +1,26 @@
 import { useEffect, useRef, useState } from "react";
-import { ZoomIn, ZoomOut, Maximize2 } from "lucide-react";
+import { ZoomIn, ZoomOut, Maximize2, AlertTriangle, Code } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface MermaidDiagramProps {
   chart: string;
+}
+
+// Clean and sanitize Mermaid chart code
+function sanitizeChart(chart: string): string {
+  let cleaned = chart.trim();
+  
+  // Remove incomplete style statements (common AI error)
+  cleaned = cleaned.replace(/style\s+\w+\s*$/gm, '');
+  cleaned = cleaned.replace(/style\s+\w+\s*\n/gm, '\n');
+  
+  // Fix common syntax issues
+  cleaned = cleaned.replace(/\s+style\s+$/gm, '');
+  
+  // Remove empty lines at the end
+  cleaned = cleaned.replace(/\n\s*\n\s*$/g, '\n');
+  
+  return cleaned;
 }
 
 export function MermaidDiagram({ chart }: MermaidDiagramProps) {
@@ -11,6 +28,7 @@ export function MermaidDiagram({ chart }: MermaidDiagramProps) {
   const [svg, setSvg] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [zoom, setZoom] = useState(1);
+  const [showCode, setShowCode] = useState(false);
 
   useEffect(() => {
     const renderDiagram = async () => {
@@ -19,6 +37,7 @@ export function MermaidDiagram({ chart }: MermaidDiagramProps) {
         mermaid.default.initialize({
           startOnLoad: false,
           theme: "dark",
+          suppressErrorRendering: true,
           themeVariables: {
             primaryColor: "#6366f1",
             primaryTextColor: "#f8fafc",
@@ -39,13 +58,14 @@ export function MermaidDiagram({ chart }: MermaidDiagramProps) {
           },
         });
 
+        const sanitized = sanitizeChart(chart);
         const id = `mermaid-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-        const { svg } = await mermaid.default.render(id, chart);
+        const { svg } = await mermaid.default.render(id, sanitized);
         setSvg(svg);
         setError("");
       } catch (err) {
         console.error("Mermaid rendering error:", err);
-        setError("Failed to render diagram");
+        setError("Diagram has syntax issues");
       }
     };
 
@@ -58,8 +78,27 @@ export function MermaidDiagram({ chart }: MermaidDiagramProps) {
 
   if (error) {
     return (
-      <div className="my-3 rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
-        {error}
+      <div className="my-3 rounded-lg border border-amber-500/50 bg-amber-500/10 overflow-hidden">
+        <div className="flex items-center justify-between px-3 py-2 border-b border-amber-500/30">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 text-amber-500" />
+            <span className="text-xs font-medium text-amber-500">Diagram couldn't render</span>
+          </div>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-6 text-xs text-amber-500 hover:text-amber-400"
+            onClick={() => setShowCode(!showCode)}
+          >
+            <Code className="h-3 w-3 mr-1" />
+            {showCode ? "Hide" : "Show"} Code
+          </Button>
+        </div>
+        {showCode && (
+          <pre className="p-3 text-xs text-muted-foreground overflow-auto max-h-40 bg-secondary/30">
+            <code>{chart}</code>
+          </pre>
+        )}
       </div>
     );
   }
