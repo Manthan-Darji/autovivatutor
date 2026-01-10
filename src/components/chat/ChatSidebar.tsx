@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   MessageSquare, 
@@ -5,9 +6,12 @@ import {
   ChevronLeft, 
   ChevronRight,
   Clock,
-  Sparkles
+  Sparkles,
+  LogOut
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { ExitConfirmDialog } from "@/components/shared/ExitConfirmDialog";
 
 interface ChatSidebarProps {
   isOpen: boolean;
@@ -25,6 +29,17 @@ const mockHistory = [
 ];
 
 export function ChatSidebar({ isOpen, onToggle, onNewChat }: ChatSidebarProps) {
+  const navigate = useNavigate();
+  const [showExitDialog, setShowExitDialog] = useState(false);
+
+  const handleExit = () => {
+    setShowExitDialog(true);
+  };
+
+  const confirmExit = () => {
+    navigate("/");
+  };
+
   return (
     <>
       {/* Toggle button when closed */}
@@ -34,7 +49,7 @@ export function ChatSidebar({ isOpen, onToggle, onNewChat }: ChatSidebarProps) {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="fixed left-4 top-4 z-50"
+            className="fixed left-4 top-4 z-50 flex flex-col gap-2"
           >
             <Button
               variant="outline"
@@ -43,6 +58,14 @@ export function ChatSidebar({ isOpen, onToggle, onNewChat }: ChatSidebarProps) {
               className="glass neon-border hover-glow h-10 w-10 rounded-xl"
             >
               <ChevronRight className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleExit}
+              className="glass neon-border hover-glow h-10 w-10 rounded-xl hover:bg-destructive/20 hover:text-destructive hover:border-destructive/50"
+            >
+              <LogOut className="h-4 w-4" />
             </Button>
           </motion.div>
         )}
@@ -56,7 +79,7 @@ export function ChatSidebar({ isOpen, onToggle, onNewChat }: ChatSidebarProps) {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -280, opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed left-0 top-0 z-40 h-screen w-[280px] glass-strong border-r border-border"
+            className="fixed left-0 top-0 z-40 h-screen w-[280px] glass-strong border-r border-border flex flex-col"
           >
             {/* Header */}
             <div className="flex h-16 items-center justify-between border-b border-border px-4">
@@ -116,8 +139,16 @@ export function ChatSidebar({ isOpen, onToggle, onNewChat }: ChatSidebarProps) {
               </div>
             </div>
 
-            {/* Footer */}
-            <div className="border-t border-border p-4">
+            {/* Footer with Exit Button */}
+            <div className="border-t border-border p-4 space-y-3">
+              <Button
+                variant="outline"
+                onClick={handleExit}
+                className="w-full gap-2 rounded-xl hover:bg-destructive/20 hover:text-destructive hover:border-destructive/50 group"
+              >
+                <LogOut className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                Exit to Dashboard
+              </Button>
               <div className="glass rounded-xl p-3 text-center">
                 <p className="text-xs text-muted-foreground">
                   Powered by <span className="font-semibold text-primary neon-text">Viva AI</span>
@@ -127,6 +158,14 @@ export function ChatSidebar({ isOpen, onToggle, onNewChat }: ChatSidebarProps) {
           </motion.aside>
         )}
       </AnimatePresence>
+
+      <ExitConfirmDialog
+        open={showExitDialog}
+        onOpenChange={setShowExitDialog}
+        onConfirm={confirmExit}
+        title="Leave the chat?"
+        description="You'll return to the dashboard. Your conversation will be saved for later."
+      />
     </>
   );
 }
