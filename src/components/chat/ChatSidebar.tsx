@@ -12,23 +12,26 @@ import {
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ExitConfirmDialog } from "@/components/shared/ExitConfirmDialog";
+import { formatDistanceToNow } from "date-fns";
+import type { ChatSession } from "@/hooks/useChatSessions";
 
 interface ChatSidebarProps {
   isOpen: boolean;
   onToggle: () => void;
   onNewChat: () => void;
+  sessions: ChatSession[];
+  currentSessionId: string | null;
+  onSelectSession: (id: string) => void;
 }
 
-// Mock history data for demo
-const mockHistory = [
-  { id: "1", title: "Quantum Physics Explained", time: "2 min ago" },
-  { id: "2", title: "Python Debugging Help", time: "1 hour ago" },
-  { id: "3", title: "Machine Learning Basics", time: "Yesterday" },
-  { id: "4", title: "Essay Writing Tips", time: "Yesterday" },
-  { id: "5", title: "Calculus Integration", time: "2 days ago" },
-];
-
-export function ChatSidebar({ isOpen, onToggle, onNewChat }: ChatSidebarProps) {
+export function ChatSidebar({ 
+  isOpen, 
+  onToggle, 
+  onNewChat, 
+  sessions, 
+  currentSessionId, 
+  onSelectSession 
+}: ChatSidebarProps) {
   const navigate = useNavigate();
   const [showExitDialog, setShowExitDialog] = useState(false);
 
@@ -116,26 +119,38 @@ export function ChatSidebar({ isOpen, onToggle, onNewChat }: ChatSidebarProps) {
                 Recent Chats
               </p>
               <div className="space-y-1">
-                {mockHistory.map((chat, index) => (
-                  <motion.button
-                    key={chat.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="group flex w-full items-start gap-3 rounded-xl p-3 text-left transition-all hover:bg-secondary/50 hover-glow"
-                  >
-                    <MessageSquare className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground group-hover:text-primary" />
-                    <div className="flex-1 overflow-hidden">
-                      <p className="truncate text-sm font-medium text-foreground">
-                        {chat.title}
-                      </p>
-                      <p className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Clock className="h-3 w-3" />
-                        {chat.time}
-                      </p>
-                    </div>
-                  </motion.button>
-                ))}
+                {sessions.length === 0 ? (
+                  <p className="px-2 py-4 text-center text-sm text-muted-foreground">
+                    No conversations yet
+                  </p>
+                ) : (
+                  sessions.map((session, index) => (
+                    <motion.button
+                      key={session.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      onClick={() => onSelectSession(session.id)}
+                      className={`group flex w-full items-start gap-3 rounded-xl p-3 text-left transition-all hover:bg-secondary/50 hover-glow ${
+                        currentSessionId === session.id ? "bg-secondary/70 border border-primary/30" : ""
+                      }`}
+                    >
+                      <MessageSquare className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground group-hover:text-primary" />
+                      <div className="flex-1 overflow-hidden">
+                        <p className="truncate text-sm font-medium text-foreground">
+                          {session.title}
+                        </p>
+                        <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Clock className="h-3 w-3" />
+                          {session.last_message_at 
+                            ? formatDistanceToNow(new Date(session.last_message_at), { addSuffix: true })
+                            : "Just now"
+                          }
+                        </p>
+                      </div>
+                    </motion.button>
+                  ))
+                )}
               </div>
             </div>
 
