@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Settings, Sparkles, Zap, LogOut } from "lucide-react";
+import { Settings, Sparkles, Zap, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
@@ -37,10 +37,10 @@ export function ChatTopBar({ connectionStatus }: ChatTopBarProps) {
             variant="ghost" 
             size="sm" 
             onClick={handleExit}
-            className="h-10 rounded-xl hover:bg-destructive/20 hover:text-destructive gap-2"
+            className="h-10 rounded-xl hover:bg-secondary gap-2 group"
           >
-            <LogOut className="h-4 w-4" />
-            <span className="hidden sm:inline">Exit</span>
+            <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+            <span className="hidden sm:inline">Back</span>
           </Button>
         </div>
       </div>
