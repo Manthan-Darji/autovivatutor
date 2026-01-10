@@ -53,7 +53,7 @@ export function WebSearchPanel({ isOpen, onClose, defaultQuery = "" }: WebSearch
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
-      className="absolute inset-0 z-50 bg-background/95 backdrop-blur-sm flex flex-col"
+      className="absolute inset-0 z-10 bg-card rounded-xl flex flex-col"
     >
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-secondary/30">
