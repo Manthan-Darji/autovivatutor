@@ -1,24 +1,36 @@
 import { LayoutDashboard, BookOpen, PlusCircle, Settings, LogOut } from "lucide-react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 interface NavItem {
   icon: React.ComponentType<{ className?: string }>;
   label: string;
-  active?: boolean;
+  path: string;
 }
 
 const navItems: NavItem[] = [
-  { icon: LayoutDashboard, label: "Dashboard", active: true },
-  { icon: BookOpen, label: "My Courses" },
-  { icon: PlusCircle, label: "Create Course" },
+  { icon: LayoutDashboard, label: "Dashboard", path: "/" },
+  { icon: BookOpen, label: "My Courses", path: "/courses" },
+  { icon: PlusCircle, label: "Create Course", path: "/create" },
 ];
 
 const bottomItems: NavItem[] = [
-  { icon: Settings, label: "Settings" },
-  { icon: LogOut, label: "Logout" },
+  { icon: Settings, label: "Settings", path: "/settings" },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  activePath?: string;
+}
+
+export function Sidebar({ activePath = "/" }: SidebarProps) {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    toast.success("Logged out successfully!");
+    navigate("/");
+  };
+
   return (
     <motion.aside
       initial={{ x: -20, opacity: 0 }}
@@ -37,27 +49,51 @@ export function Sidebar() {
       {/* Main Navigation */}
       <nav className="flex-1 space-y-1 px-3">
         {navItems.map((item) => (
-          <NavButton key={item.label} item={item} />
+          <NavButton 
+            key={item.label} 
+            item={item} 
+            isActive={activePath === item.path}
+            onClick={() => navigate(item.path)}
+          />
         ))}
       </nav>
 
       {/* Bottom Navigation */}
       <div className="space-y-1 px-3">
         {bottomItems.map((item) => (
-          <NavButton key={item.label} item={item} />
+          <NavButton 
+            key={item.label} 
+            item={item} 
+            isActive={activePath === item.path}
+            onClick={() => navigate(item.path)}
+          />
         ))}
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-sidebar-foreground hover:bg-destructive/20 hover:text-destructive"
+        >
+          <LogOut className="h-5 w-5" />
+          <span>Logout</span>
+        </button>
       </div>
     </motion.aside>
   );
 }
 
-function NavButton({ item }: { item: NavItem }) {
+interface NavButtonProps {
+  item: NavItem;
+  isActive: boolean;
+  onClick: () => void;
+}
+
+function NavButton({ item, isActive, onClick }: NavButtonProps) {
   const Icon = item.icon;
   
   return (
     <button
+      onClick={onClick}
       className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
-        item.active
+        isActive
           ? "bg-sidebar-primary text-sidebar-primary-foreground"
           : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
       }`}
