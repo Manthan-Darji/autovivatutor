@@ -1,34 +1,33 @@
-import { Settings, GraduationCap } from "lucide-react";
+import { motion } from "framer-motion";
+import { Settings, Sparkles, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ChatTopBarProps {
-  onSettingsClick?: () => void;
+  connectionStatus?: string | null;
 }
 
-export function ChatTopBar({ onSettingsClick }: ChatTopBarProps) {
+export function ChatTopBar({ connectionStatus }: ChatTopBarProps) {
   return (
-    <header className="flex h-16 items-center justify-between border-b border-border bg-card px-4 shadow-sm">
-      {/* Logo & Branding */}
-      <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary">
-          <GraduationCap className="h-5 w-5 text-primary-foreground" />
+    <motion.header initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="glass-strong border-b border-border">
+      <div className="flex h-16 items-center justify-between px-6">
+        <div className="flex items-center gap-3">
+          <motion.div whileHover={{ scale: 1.05 }} className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent neon-glow">
+            <Sparkles className="h-5 w-5 text-primary-foreground" />
+          </motion.div>
+          <div>
+            <h1 className="text-lg font-bold"><span className="bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">Viva AI Tutor</span></h1>
+            {connectionStatus ? (
+              <div className="flex items-center gap-1.5"><motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 1, repeat: Infinity }} className="h-2 w-2 rounded-full bg-yellow-500" /><span className="text-xs text-yellow-500">{connectionStatus}</span></div>
+            ) : (
+              <div className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-green-500" /><span className="text-xs text-muted-foreground">Ready to help</span></div>
+            )}
+          </div>
         </div>
-        <div>
-          <h1 className="text-lg font-semibold text-foreground">Viva AI Tutor</h1>
-          <p className="text-xs text-muted-foreground">Your personal learning assistant</p>
+        <div className="flex items-center gap-2">
+          <div className="hidden sm:flex items-center gap-2 rounded-full glass px-3 py-1.5"><Zap className="h-3.5 w-3.5 text-primary" /><span className="text-xs font-medium text-muted-foreground">AI Powered</span></div>
+          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-secondary"><Settings className="h-5 w-5" /></Button>
         </div>
       </div>
-
-      {/* Settings Button */}
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={onSettingsClick}
-        className="h-10 w-10 rounded-xl hover:bg-muted"
-      >
-        <Settings className="h-5 w-5 text-muted-foreground" />
-        <span className="sr-only">Settings</span>
-      </Button>
-    </header>
+    </motion.header>
   );
 }

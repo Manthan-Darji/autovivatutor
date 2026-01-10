@@ -23,7 +23,8 @@ export async function sendMessage(message: string): Promise<string> {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ message }),
+      // Use "query" key for the API (can be changed to "message" if needed)
+      body: JSON.stringify({ query: message }),
       signal: controller.signal,
     });
 
