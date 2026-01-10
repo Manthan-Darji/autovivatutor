@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { CourseGenerationModal } from "@/components/course/CourseGenerationModal";
 
 const suggestions = [
   { icon: "🐍", title: "Python Programming", desc: "Learn coding basics" },
@@ -17,26 +17,17 @@ const suggestions = [
 ];
 
 const CreateCourse = () => {
-  const navigate = useNavigate();
   const [topic, setTopic] = useState("");
   const [description, setDescription] = useState("");
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleGenerate = async () => {
+  const handleGenerate = () => {
     if (!topic.trim()) {
       toast.error("Please enter a course topic");
       return;
     }
     
-    setIsGenerating(true);
-    
-    // Simulate course generation
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    
-    toast.success("Course curriculum generated! Redirecting to chat...");
-    setIsGenerating(false);
-    
-    navigate("/chat");
+    setIsModalOpen(true);
   };
 
   const handleSuggestionClick = (title: string) => {
@@ -142,25 +133,22 @@ const CreateCourse = () => {
 
               <Button
                 onClick={handleGenerate}
-                disabled={isGenerating}
                 className="w-full gap-2 h-12"
               >
-                {isGenerating ? (
-                  <>
-                    <Sparkles className="h-5 w-5 animate-pulse" />
-                    Generating Curriculum...
-                  </>
-                ) : (
-                  <>
-                    <Wand2 className="h-5 w-5" />
-                    Generate Course with AI
-                  </>
-                )}
+                <Wand2 className="h-5 w-5" />
+                Generate Course with AI
               </Button>
             </div>
           </motion.div>
         </div>
       </main>
+
+      <CourseGenerationModal
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        topic={topic}
+        description={description}
+      />
     </div>
   );
 };
