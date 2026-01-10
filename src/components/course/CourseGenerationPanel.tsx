@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Send, Loader2, Copy, ThumbsUp, ThumbsDown, Sparkles, User, Save } from "lucide-react";
+import { ArrowLeft, Send, Loader2, Copy, ThumbsUp, ThumbsDown, Sparkles, User, Save, Search } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { sendMessage as sendMessageToApi, generateMessageId, type ChatMessage } from "@/services/chatService";
 import { toast } from "sonner";
 import { CourseMarkdownRenderer } from "./CourseMarkdownRenderer";
+import { WebSearchPanel } from "./WebSearchPanel";
 
 interface CourseGenerationPanelProps {
   topic: string;
@@ -18,6 +19,7 @@ export function CourseGenerationPanel({ topic, description, onBack }: CourseGene
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [displayedResponse, setDisplayedResponse] = useState("");
+  const [showSearch, setShowSearch] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const hasInitialized = useRef(false);
@@ -165,10 +167,21 @@ graph TD
             <p className="text-xs text-muted-foreground line-clamp-1">{topic}</p>
           </div>
         </div>
-        <Button variant="outline" size="sm" onClick={handleSaveCourse} className="gap-1.5">
-          <Save className="h-3.5 w-3.5" />
-          Save Course
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setShowSearch(true)} 
+            className="gap-1.5"
+          >
+            <Search className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Search Web</span>
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleSaveCourse} className="gap-1.5">
+            <Save className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Save Course</span>
+          </Button>
+        </div>
       </div>
 
       {/* Messages Area */}
@@ -303,6 +316,16 @@ graph TD
           </Button>
         </form>
       </div>
+      {/* Web Search Panel */}
+      <AnimatePresence>
+        {showSearch && (
+          <WebSearchPanel 
+            isOpen={showSearch} 
+            onClose={() => setShowSearch(false)}
+            defaultQuery={topic}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
