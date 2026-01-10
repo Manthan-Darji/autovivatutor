@@ -1,0 +1,105 @@
+import { useEffect, useRef, useState } from "react";
+import { ZoomIn, ZoomOut, Maximize2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+interface MermaidDiagramProps {
+  chart: string;
+}
+
+export function MermaidDiagram({ chart }: MermaidDiagramProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [svg, setSvg] = useState<string>("");
+  const [error, setError] = useState<string>("");
+  const [zoom, setZoom] = useState(1);
+
+  useEffect(() => {
+    const renderDiagram = async () => {
+      try {
+        const mermaid = await import("mermaid");
+        mermaid.default.initialize({
+          startOnLoad: false,
+          theme: "dark",
+          themeVariables: {
+            primaryColor: "#6366f1",
+            primaryTextColor: "#f8fafc",
+            primaryBorderColor: "#4f46e5",
+            lineColor: "#64748b",
+            secondaryColor: "#1e293b",
+            tertiaryColor: "#0f172a",
+            background: "#0f172a",
+            mainBkg: "#1e293b",
+            nodeBorder: "#4f46e5",
+            clusterBkg: "#1e293b",
+            titleColor: "#f8fafc",
+            edgeLabelBackground: "#1e293b",
+          },
+          flowchart: {
+            curve: "basis",
+            padding: 20,
+          },
+        });
+
+        const id = `mermaid-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const { svg } = await mermaid.default.render(id, chart);
+        setSvg(svg);
+        setError("");
+      } catch (err) {
+        console.error("Mermaid rendering error:", err);
+        setError("Failed to render diagram");
+      }
+    };
+
+    renderDiagram();
+  }, [chart]);
+
+  const handleZoomIn = () => setZoom((z) => Math.min(z + 0.25, 2));
+  const handleZoomOut = () => setZoom((z) => Math.max(z - 0.25, 0.5));
+  const handleReset = () => setZoom(1);
+
+  if (error) {
+    return (
+      <div className="my-3 rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
+        {error}
+      </div>
+    );
+  }
+
+  if (!svg) {
+    return (
+      <div className="my-3 rounded-lg border border-border bg-secondary/50 p-8 flex items-center justify-center">
+        <div className="flex gap-1">
+          <span className="h-2 w-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "0ms" }} />
+          <span className="h-2 w-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "150ms" }} />
+          <span className="h-2 w-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "300ms" }} />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="my-3 rounded-lg border border-border bg-secondary/30 overflow-hidden">
+      <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-secondary/50">
+        <span className="text-xs font-medium text-muted-foreground">📊 Diagram</span>
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleZoomOut}>
+            <ZoomOut className="h-3 w-3" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleReset}>
+            <Maximize2 className="h-3 w-3" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleZoomIn}>
+            <ZoomIn className="h-3 w-3" />
+          </Button>
+        </div>
+      </div>
+      <div className="overflow-auto p-4" style={{ maxHeight: "400px" }}>
+        <div
+          ref={containerRef}
+          className="flex items-center justify-center transition-transform"
+          style={{ transform: `scale(${zoom})`, transformOrigin: "center top" }}
+          dangerouslySetInnerHTML={{ __html: svg }}
+        />
+      </div>
+    </div>
+  );
+}
