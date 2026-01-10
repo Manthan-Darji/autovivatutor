@@ -1,12 +1,22 @@
-import { Plus } from "lucide-react";
+import { Plus, LogOut } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 interface DashboardHeaderProps {
   streak?: number;
 }
 
 export function DashboardHeader({ streak = 3 }: DashboardHeaderProps) {
+  const navigate = useNavigate();
+
+  const handleExit = () => {
+    toast.success("Goodbye! See you next time 👋");
+    // In a real app, this would redirect to a landing page or login
+    window.location.href = "about:blank";
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: -10 }}
@@ -32,11 +42,21 @@ export function DashboardHeader({ streak = 3 }: DashboardHeaderProps) {
         </p>
       </div>
 
-      {/* New Course Button */}
-      <Button className="gap-2 shadow-md">
-        <Plus className="h-4 w-4" />
-        New Course
-      </Button>
+      {/* Action Buttons */}
+      <div className="flex items-center gap-3">
+        <Button 
+          variant="outline" 
+          onClick={handleExit}
+          className="gap-2 group"
+        >
+          <LogOut className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          Exit
+        </Button>
+        <Button className="gap-2 shadow-md" onClick={() => navigate("/create")}>
+          <Plus className="h-4 w-4" />
+          New Course
+        </Button>
+      </div>
     </motion.div>
   );
 }
