@@ -6,7 +6,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const AI_BACKEND_URL = "https://copy-of-viva-ai-tutor-250579881996.us-west1.run.app/chat";
+const AI_BACKEND_URL = "https://copy-of-viva-ai-tutor-250579881996.us-west1.run.app";
 
 serve(async (req) => {
   // Handle CORS preflight
