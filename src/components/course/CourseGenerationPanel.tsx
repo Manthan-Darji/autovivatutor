@@ -149,7 +149,7 @@ graph TD
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="rounded-xl border border-border bg-card overflow-hidden flex flex-col h-[calc(100vh-200px)] min-h-[500px]"
+      className="relative rounded-xl border border-border bg-card overflow-hidden flex flex-col h-[calc(100vh-200px)] min-h-[500px]"
     >
       {/* Header */}
       <div className="px-4 py-3 border-b border-border flex items-center justify-between flex-shrink-0 bg-secondary/30">
