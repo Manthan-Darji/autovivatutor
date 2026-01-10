@@ -1,4 +1,4 @@
-const API_URL = "https://copy-of-viva-ai-tutor-250579881996.us-west1.run.app";
+const API_URL = "https://corsproxy.io/?https://copy-of-viva-ai-tutor-250579881996.us-west1.run.app/chat";
 
 export interface ChatMessage {
   id: string;
