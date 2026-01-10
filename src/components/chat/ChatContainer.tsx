@@ -29,12 +29,7 @@ export function ChatContainer() {
   };
 
   return (
-    <div className="relative flex h-screen overflow-hidden gradient-bg">
-      {/* Background Orbs */}
-      <div className="orb orb-indigo absolute -top-40 -right-40 h-80 w-80 opacity-50" />
-      <div className="orb orb-purple absolute -bottom-40 -left-40 h-96 w-96 opacity-40" />
-      <div className="orb orb-indigo absolute top-1/2 left-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 opacity-20" />
-
+    <div className="relative flex h-screen overflow-hidden bg-background">
       {/* Sidebar */}
       <ChatSidebar
         isOpen={sidebarOpen}
@@ -44,7 +39,7 @@ export function ChatContainer() {
 
       {/* Main Content */}
       <motion.div
-        animate={{ 
+        animate={{
           marginLeft: sidebarOpen ? 280 : 0,
         }}
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
@@ -55,28 +50,28 @@ export function ChatContainer() {
 
         {/* Chat Messages Area */}
         <div className="flex-1 overflow-y-auto">
-          <div className="mx-auto max-w-3xl space-y-6 p-6">
-            {messages.length === 0 && !isLoading && !isTyping ? (
-              <ChatWelcome onSuggestionClick={sendMessage} />
-            ) : (
+          {messages.length === 0 && !isLoading && !isTyping ? (
+            <ChatWelcome onSuggestionClick={sendMessage} />
+          ) : (
+            <div className="pb-4">
               <AnimatePresence mode="popLayout">
                 {messages.map((message) => (
                   <ChatMessage key={message.id} message={message} />
                 ))}
               </AnimatePresence>
-            )}
 
-            {/* Typewriter response */}
-            {isTyping && displayedResponse && (
-              <TypewriterMessage content={displayedResponse} />
-            )}
+              {/* Typewriter response */}
+              {isTyping && displayedResponse && (
+                <TypewriterMessage content={displayedResponse} />
+              )}
 
-            {/* Thinking indicator */}
-            {isLoading && !isTyping && <ChatThinking />}
+              {/* Thinking indicator */}
+              {isLoading && !isTyping && <ChatThinking />}
 
-            {/* Scroll anchor */}
-            <div ref={messagesEndRef} />
-          </div>
+              {/* Scroll anchor */}
+              <div ref={messagesEndRef} />
+            </div>
+          )}
         </div>
 
         {/* Input Area */}
@@ -84,11 +79,11 @@ export function ChatContainer() {
           onSend={sendMessage}
           disabled={isLoading || isTyping}
           placeholder={
-            isLoading 
-              ? "Waiting for response..." 
-              : isTyping 
-                ? "AI is responding..." 
-                : "Ask me anything..."
+            isLoading
+              ? "Waiting for response..."
+              : isTyping
+                ? "AI is responding..."
+                : "Message Viva AI..."
           }
         />
       </motion.div>
