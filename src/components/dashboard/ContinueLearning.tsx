@@ -1,5 +1,6 @@
-import { Plus } from "lucide-react";
+import { Plus, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 export function ContinueLearning() {
   return (
@@ -16,22 +17,23 @@ export function ContinueLearning() {
         </button>
       </div>
 
-      {/* Empty State Card */}
-      <div className="flex min-h-[180px] flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-card p-8 transition-colors hover:border-primary/50">
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="mb-4 flex h-14 w-14 items-center justify-center rounded-full border-2 border-dashed border-muted-foreground/40 text-muted-foreground transition-colors hover:border-primary hover:text-primary"
-        >
-          <Plus className="h-6 w-6" />
-        </motion.button>
-        <h4 className="mb-1 text-lg font-semibold text-foreground">
-          Start your first course
-        </h4>
-        <p className="text-center text-sm text-muted-foreground">
-          Generate a custom curriculum in seconds with AI.
-        </p>
-      </div>
+      {/* Start Learning Card - Links to Chat */}
+      <Link to="/chat" className="block">
+        <div className="flex min-h-[180px] flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-card p-8 transition-all hover:border-primary hover:shadow-md">
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="mb-4 flex h-14 w-14 items-center justify-center rounded-full border-2 border-primary/30 bg-primary/10 text-primary"
+          >
+            <MessageCircle className="h-6 w-6" />
+          </motion.div>
+          <h4 className="mb-1 text-lg font-semibold text-foreground">
+            Chat with AI Tutor
+          </h4>
+          <p className="text-center text-sm text-muted-foreground">
+            Start a conversation and learn anything you want.
+          </p>
+        </div>
+      </Link>
     </motion.div>
   );
 }
