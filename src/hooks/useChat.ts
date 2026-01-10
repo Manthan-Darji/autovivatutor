@@ -62,12 +62,21 @@ export function useChat(options: UseChatOptions = {}) {
       timestamp: new Date(),
     };
     
-    setMessages((prev) => [...prev, userMessage]);
+    // Get current messages before updating state
+    const currentMessages = [...messages, userMessage];
+    
+    setMessages(currentMessages);
     setIsLoading(true);
     setConnectionStatus("Connecting to Brain...");
 
+    // Build conversation history for context
+    const conversationHistory = currentMessages.map((msg) => ({
+      role: msg.role,
+      content: msg.content,
+    }));
+
     try {
-      const response = await sendMessageToApi(content);
+      const response = await sendMessageToApi(content, conversationHistory);
       setConnectionStatus(null);
 
       // Use typewriter effect for the response

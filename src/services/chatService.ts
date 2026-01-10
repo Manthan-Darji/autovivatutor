@@ -13,10 +13,16 @@ export interface SendMessageResponse {
   error?: string;
 }
 
-export async function sendMessage(message: string): Promise<string> {
+export async function sendMessage(
+  message: string,
+  conversationHistory: Array<{ role: "user" | "assistant"; content: string }> = []
+): Promise<string> {
   try {
     const { data, error } = await supabase.functions.invoke('ai-chat', {
-      body: { query: message },
+      body: { 
+        query: message,
+        history: conversationHistory 
+      },
     });
 
     if (error) {

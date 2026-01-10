@@ -5,6 +5,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+type Message = { role: "system" | "user" | "assistant"; content: string };
+
 type ChatCompletionsResponse = {
   choices?: Array<{
     message?: { content?: string };
@@ -21,13 +23,13 @@ serve(async (req) => {
     try {
       payload = await req.json();
     } catch {
-      // Non-fatal: we return a 200 with an error payload so the client doesn't crash on non-2xx
       return new Response(JSON.stringify({ error: "Invalid JSON body" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     const query = payload?.query;
+    const history: Array<{ role: "user" | "assistant"; content: string }> = payload?.history || [];
 
     if (!query || typeof query !== "string") {
       return new Response(JSON.stringify({ error: "Query is required" }), {
@@ -42,6 +44,36 @@ serve(async (req) => {
       });
     }
 
+    // Build messages array with conversation history
+    const messages: Message[] = [
+      {
+        role: "system",
+        content: `You are Viva AI Tutor, an intelligent and friendly educational assistant. Your role is to:
+- Explain concepts clearly with step-by-step breakdowns
+- Adapt explanations to the learner's level based on their questions
+- Use examples, analogies, and bullet points for clarity
+- Remember context from the conversation to provide relevant follow-ups
+- Encourage curiosity and deeper understanding
+- Be patient, supportive, and enthusiastic about learning
+
+Keep responses focused and helpful. Use markdown formatting for better readability.`,
+      },
+    ];
+
+    // Add conversation history (limit to last 20 messages to avoid token limits)
+    const recentHistory = history.slice(-20);
+    for (const msg of recentHistory) {
+      messages.push({
+        role: msg.role,
+        content: msg.content,
+      });
+    }
+
+    // Add the current user query
+    messages.push({ role: "user", content: query });
+
+    console.log(`Processing query with ${recentHistory.length} history messages`);
+
     const gatewayResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -50,20 +82,12 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are Viva AI Tutor. Explain concepts clearly, step-by-step, and adapt to the learner. Use concise bullets and examples when helpful.",
-          },
-          { role: "user", content: query },
-        ],
-        temperature: 0.3,
+        messages,
+        temperature: 0.4,
       }),
     });
 
     if (!gatewayResp.ok) {
-      // Return 200 + {error} so supabase.functions.invoke doesn't throw a transport error for non-2xx.
       if (gatewayResp.status === 429) {
         return new Response(JSON.stringify({ error: "Too many requests. Please wait a moment and try again." }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -96,7 +120,6 @@ serve(async (req) => {
     console.error("Error in ai-chat function:", error);
     const msg = error instanceof Error ? error.message : "An unexpected error occurred";
 
-    // Return 200 + {error} to avoid the client treating it like a 404/500 transport failure.
     return new Response(JSON.stringify({ error: msg }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
