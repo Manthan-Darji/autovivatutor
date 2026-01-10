@@ -2,11 +2,9 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Send, Loader2, Copy, ThumbsUp, ThumbsDown, Sparkles, User, Save } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import ReactMarkdown from "react-markdown";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { sendMessage as sendMessageToApi, generateMessageId, type ChatMessage } from "@/services/chatService";
 import { toast } from "sonner";
+import { CourseMarkdownRenderer } from "./CourseMarkdownRenderer";
 
 interface CourseGenerationPanelProps {
   topic: string;
@@ -36,7 +34,27 @@ export function CourseGenerationPanel({ topic, description, onBack }: CourseGene
   useEffect(() => {
     if (!hasInitialized.current && topic) {
       hasInitialized.current = true;
-      const initialPrompt = `Create a comprehensive learning curriculum for: "${topic}"${description ? `\n\nGoals: ${description}` : ""}\n\nPlease include:\n1. Course overview\n2. Module breakdown\n3. Key learning objectives\n4. Recommended timeline\n5. Prerequisites (if any)`;
+      const initialPrompt = `Create a comprehensive learning curriculum for: "${topic}"${description ? `\n\nGoals: ${description}` : ""}
+
+Please include:
+1. **Course Overview** - Brief description of what students will learn
+2. **Module Breakdown** - Detailed modules with topics
+3. **Key Learning Objectives** - What students will be able to do
+4. **Recommended Timeline** - Duration for each module
+5. **Prerequisites** (if any)
+
+**IMPORTANT - Include Visual Learning Aids:**
+- Add a Mermaid diagram showing the learning path/flow using \`\`\`mermaid code blocks (flowchart, mindmap, or sequence diagram)
+- For each major module, recommend 1-2 relevant YouTube tutorial videos with direct links like [Video Title](https://youtube.com/watch?v=VIDEO_ID)
+- Use blockquotes for helpful tips
+
+Example Mermaid diagram format:
+\`\`\`mermaid
+graph TD
+    A[Start] --> B[Module 1]
+    B --> C[Module 2]
+    C --> D[Complete]
+\`\`\``;
       
       handleSendMessage(initialPrompt);
     }
@@ -183,30 +201,7 @@ export function CourseGenerationPanel({ topic, description, onBack }: CourseGene
                     </span>
                   </div>
                   <div className="prose prose-sm dark:prose-invert max-w-none text-foreground text-sm">
-                    <ReactMarkdown
-                      components={{
-                        code({ node, className, children, ...props }) {
-                          const match = /language-(\w+)/.exec(className || "");
-                          const isInline = !match;
-                          return isInline ? (
-                            <code className="rounded bg-muted px-1.5 py-0.5 text-xs font-mono" {...props}>
-                              {children}
-                            </code>
-                          ) : (
-                            <SyntaxHighlighter
-                              style={oneDark}
-                              language={match[1]}
-                              PreTag="div"
-                              className="rounded-lg !my-2 !text-xs"
-                            >
-                              {String(children).replace(/\n$/, "")}
-                            </SyntaxHighlighter>
-                          );
-                        },
-                      }}
-                    >
-                      {message.content}
-                    </ReactMarkdown>
+                    <CourseMarkdownRenderer content={message.content} />
                   </div>
                   {message.role === "assistant" && (
                     <div className="flex items-center gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -247,30 +242,7 @@ export function CourseGenerationPanel({ topic, description, onBack }: CourseGene
                     <span className="text-xs font-medium text-foreground">AI Tutor</span>
                   </div>
                   <div className="prose prose-sm dark:prose-invert max-w-none text-foreground text-sm">
-                    <ReactMarkdown
-                      components={{
-                        code({ node, className, children, ...props }) {
-                          const match = /language-(\w+)/.exec(className || "");
-                          const isInline = !match;
-                          return isInline ? (
-                            <code className="rounded bg-muted px-1.5 py-0.5 text-xs font-mono" {...props}>
-                              {children}
-                            </code>
-                          ) : (
-                            <SyntaxHighlighter
-                              style={oneDark}
-                              language={match[1]}
-                              PreTag="div"
-                              className="rounded-lg !my-2 !text-xs"
-                            >
-                              {String(children).replace(/\n$/, "")}
-                            </SyntaxHighlighter>
-                          );
-                        },
-                      }}
-                    >
-                      {displayedResponse}
-                    </ReactMarkdown>
+                    <CourseMarkdownRenderer content={displayedResponse} />
                   </div>
                 </div>
               </div>
