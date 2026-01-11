@@ -9,7 +9,7 @@ interface AuthContextType {
   session: Session | null;
   role: AppRole | null;
   isLoading: boolean;
-  signUp: (email: string, password: string, displayName: string, role: AppRole) => Promise<void>;
+  signUp: (email: string, password: string, displayName: string, role: AppRole, schoolName: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -65,8 +65,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, displayName: string, role: AppRole) => {
-    const { error } = await supabase.auth.signUp({
+  const signUp = async (email: string, password: string, displayName: string, role: AppRole, schoolName: string) => {
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -74,11 +74,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         data: {
           display_name: displayName,
           role: role,
+          school_name: schoolName,
         },
       },
     });
     
     if (error) throw error;
+
+    // Create profile with school_name after successful signup
+    if (data.user) {
+      await supabase.from("profiles").insert({
+        user_id: data.user.id,
+        display_name: displayName,
+        school_name: schoolName,
+      });
+    }
   };
 
   const signIn = async (email: string, password: string) => {
