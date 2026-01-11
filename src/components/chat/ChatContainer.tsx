@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { ChatTopBar } from "./ChatTopBar";
@@ -15,8 +15,10 @@ export function ChatContainer() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const topicSentRef = useRef(false);
   
   const sessionId = searchParams.get("session");
+  const topic = searchParams.get("topic");
   
   const { sessions, createSession, updateSessionTitle } = useChatSessions();
   
@@ -31,6 +33,17 @@ export function ChatContainer() {
     sendMessage,
     clearMessages,
   } = useChatMessages({ sessionId });
+
+  // Auto-send topic when navigating from Interest-Based Learning
+  useEffect(() => {
+    if (sessionId && topic && !topicSentRef.current && !isFetching && messages.length === 0) {
+      topicSentRef.current = true;
+      const topicMessage = `I want to learn about ${topic}. Please explain the basics and help me understand this topic step by step.`;
+      sendMessage(topicMessage);
+      // Remove topic from URL to prevent re-sending
+      setSearchParams({ session: sessionId });
+    }
+  }, [sessionId, topic, isFetching, messages.length, sendMessage, setSearchParams]);
 
   // Auto-update session title based on first user message
   useEffect(() => {
