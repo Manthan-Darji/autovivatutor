@@ -5,6 +5,8 @@ import { LearningActivityChart } from "@/components/dashboard/LearningActivityCh
 import { SkillMasteryChart } from "@/components/dashboard/SkillMasteryChart";
 import { ContinueLearning } from "@/components/dashboard/ContinueLearning";
 import { TeacherDashboardContent } from "@/components/dashboard/TeacherDashboardContent";
+import { InterestBasedLearning } from "@/components/dashboard/InterestBasedLearning";
+import { BrainBreakBanner } from "@/components/dashboard/BrainBreakBanner";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loader2 } from "lucide-react";
 
@@ -33,6 +35,12 @@ const Index = () => {
             <>
               {/* Header */}
               <DashboardHeader streak={3} />
+
+              {/* Brain Break Banner */}
+              <BrainBreakBanner />
+
+              {/* Interest-Based Learning */}
+              <InterestBasedLearning />
 
               {/* Stats Cards */}
               <div className="mb-6">
