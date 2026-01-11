@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Sidebar } from "@/components/layout/Sidebar";
-import { BookOpen, Clock, ArrowRight, GraduationCap } from "lucide-react";
+import { BookOpen, Clock, ArrowRight, GraduationCap, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -159,14 +159,28 @@ const MyCourses = () => {
                       <Clock className="h-3.5 w-3.5" />
                       {formatLastAccessed(course.lastAccessed)}
                     </span>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      className="gap-1.5"
-                    >
-                      View Course
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-1.5"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/course/${course.id}?tab=syllabus`);
+                        }}
+                      >
+                        <FileText className="h-3.5 w-3.5" />
+                        Syllabus
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="gap-1.5"
+                      >
+                        View Course
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
                   </div>
                 </motion.div>
               ))}
