@@ -1,16 +1,97 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Sidebar } from "@/components/layout/Sidebar";
-import { Settings as SettingsIcon, User, Bell, Palette, Shield, Volume2 } from "lucide-react";
+import { Settings as SettingsIcon, User, Bell, Palette, Shield, Volume2, School, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+
+interface ProfileData {
+  display_name: string;
+  school_name: string;
+}
 
 const Settings = () => {
-  const handleSave = () => {
-    toast.success("Settings saved successfully!");
+  const { user } = useAuth();
+  const [profile, setProfile] = useState<ProfileData>({ display_name: "", school_name: "" });
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      fetchProfile();
+    }
+  }, [user]);
+
+  const fetchProfile = async () => {
+    if (!user) return;
+    
+    setIsLoading(true);
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("display_name, school_name")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (data) {
+      setProfile({
+        display_name: data.display_name || "",
+        school_name: data.school_name || "",
+      });
+    }
+    setIsLoading(false);
+  };
+
+  const handleSave = async () => {
+    if (!user) return;
+
+    setIsSaving(true);
+    
+    // Check if profile exists
+    const { data: existingProfile } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    let error;
+    
+    if (existingProfile) {
+      // Update existing profile
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({
+          display_name: profile.display_name,
+          school_name: profile.school_name,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("user_id", user.id);
+      error = updateError;
+    } else {
+      // Create new profile
+      const { error: insertError } = await supabase
+        .from("profiles")
+        .insert({
+          user_id: user.id,
+          display_name: profile.display_name,
+          school_name: profile.school_name,
+        });
+      error = insertError;
+    }
+
+    if (error) {
+      toast.error("Failed to save profile. Please try again.");
+      console.error("Profile save error:", error);
+    } else {
+      toast.success("Profile updated successfully!");
+    }
+    
+    setIsSaving(false);
   };
 
   return (
@@ -53,16 +134,48 @@ const Settings = () => {
                 </div>
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <Label htmlFor="name">Display Name</Label>
-                  <Input id="name" placeholder="Scholar" className="mt-2" defaultValue="Scholar" />
+              {isLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                 </div>
-                <div>
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="you@example.com" className="mt-2" />
+              ) : (
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <Label htmlFor="name">Display Name</Label>
+                    <Input
+                      id="name"
+                      placeholder="Your name"
+                      className="mt-2"
+                      value={profile.display_name}
+                      onChange={(e) => setProfile({ ...profile, display_name: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="school">School / College</Label>
+                    <div className="relative mt-2">
+                      <School className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="school"
+                        placeholder="e.g., Harvard University"
+                        className="pl-10"
+                        value={profile.school_name}
+                        onChange={(e) => setProfile({ ...profile, school_name: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      className="mt-2"
+                      value={user?.email || ""}
+                      disabled
+                    />
+                    <p className="mt-1 text-xs text-muted-foreground">Email cannot be changed</p>
+                  </div>
                 </div>
-              </div>
+              )}
             </motion.div>
 
             {/* Notifications Section */}
@@ -171,7 +284,8 @@ const Settings = () => {
               </div>
             </motion.div>
 
-            <Button onClick={handleSave} className="w-full h-12">
+            <Button onClick={handleSave} className="w-full h-12" disabled={isSaving || isLoading}>
+              {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Save Settings
             </Button>
           </div>
