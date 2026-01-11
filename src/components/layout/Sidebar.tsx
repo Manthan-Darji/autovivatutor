@@ -1,4 +1,4 @@
-import { LayoutDashboard, BookOpen, PlusCircle, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, BookOpen, PlusCircle, Settings, LogOut, MessageSquare } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -9,10 +9,12 @@ interface NavItem {
   label: string;
   path: string;
   teacherOnly?: boolean;
+  studentOnly?: boolean;
 }
 
 const navItems: NavItem[] = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
+  { icon: MessageSquare, label: "Ask Doubts", path: "/chat-history", studentOnly: true },
   { icon: BookOpen, label: "My Courses", path: "/courses" },
   { icon: PlusCircle, label: "Create Course", path: "/create", teacherOnly: true },
 ];
@@ -30,9 +32,11 @@ export function Sidebar({ activePath = "/" }: SidebarProps) {
   const { signOut, role } = useAuth();
 
   // Filter nav items based on role
-  const filteredNavItems = navItems.filter(
-    (item) => !item.teacherOnly || role === "teacher"
-  );
+  const filteredNavItems = navItems.filter((item) => {
+    if (item.teacherOnly && role !== "teacher") return false;
+    if (item.studentOnly && role !== "student") return false;
+    return true;
+  });
 
   const handleLogout = async () => {
     try {
