@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { GraduationCap, Loader2, Users, BookOpen } from "lucide-react";
+import { GraduationCap, Loader2, Users, BookOpen, School } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 type AppRole = "teacher" | "student";
 
@@ -15,6 +16,7 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
+  const [schoolName, setSchoolName] = useState("");
   const [role, setRole] = useState<AppRole>("student");
   const [isLoading, setIsLoading] = useState(false);
   const { signUp } = useAuth();
@@ -26,7 +28,7 @@ export default function Signup() {
     setIsLoading(true);
 
     try {
-      await signUp(email, password, displayName, role);
+      await signUp(email, password, displayName, role, schoolName);
       toast({
         title: "Account created!",
         description: "You can now start learning.",
@@ -103,6 +105,22 @@ export default function Signup() {
                 onChange={(e) => setDisplayName(e.target.value)}
                 required
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="schoolName">School / College Name</Label>
+              <div className="relative">
+                <School className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  id="schoolName"
+                  type="text"
+                  placeholder="e.g., Harvard University"
+                  value={schoolName}
+                  onChange={(e) => setSchoolName(e.target.value)}
+                  className="pl-10"
+                  required
+                />
+              </div>
             </div>
 
             <div className="space-y-2">

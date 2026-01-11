@@ -11,13 +11,23 @@ import {
   ChevronRight,
   GraduationCap,
   BarChart3,
-  Plus
+  Plus,
+  School,
+  Filter
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -30,6 +40,7 @@ import {
 interface StudentData {
   user_id: string;
   display_name: string | null;
+  school_name: string | null;
   total_sessions: number;
   total_messages: number;
   last_active: string | null;
@@ -40,6 +51,7 @@ export function TeacherDashboardContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedStudent, setSelectedStudent] = useState<string | null>(null);
   const [studentSessions, setStudentSessions] = useState<any[]>([]);
+  const [schoolFilter, setSchoolFilter] = useState<string>("");
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -53,7 +65,7 @@ export function TeacherDashboardContent() {
       // Get all profiles (teachers can see all due to RLS)
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("user_id, display_name");
+        .select("user_id, display_name, school_name");
 
       // Get all user roles to filter students
       const { data: roles } = await supabase
@@ -85,6 +97,7 @@ export function TeacherDashboardContent() {
         studentDataMap.set(userId, {
           user_id: userId,
           display_name: profile?.display_name || "Anonymous Student",
+          school_name: profile?.school_name || null,
           total_sessions: userSessions.length,
           total_messages: totalMessages,
           last_active: lastActive || null,
@@ -110,10 +123,20 @@ export function TeacherDashboardContent() {
     setStudentSessions(data || []);
   };
 
-  const totalStudents = students.length;
-  const totalSessions = students.reduce((sum, s) => sum + s.total_sessions, 0);
-  const totalMessages = students.reduce((sum, s) => sum + s.total_messages, 0);
-  const activeToday = students.filter(
+  // Get unique schools for filter dropdown
+  const uniqueSchools = Array.from(
+    new Set(students.map((s) => s.school_name).filter(Boolean))
+  ) as string[];
+
+  // Filter students by school
+  const filteredStudents = schoolFilter
+    ? students.filter((s) => s.school_name === schoolFilter)
+    : students;
+
+  const totalStudents = filteredStudents.length;
+  const totalSessions = filteredStudents.reduce((sum, s) => sum + s.total_sessions, 0);
+  const totalMessages = filteredStudents.reduce((sum, s) => sum + s.total_messages, 0);
+  const activeToday = filteredStudents.filter(
     (s) => s.last_active && new Date(s.last_active).toDateString() === new Date().toDateString()
   ).length;
 
@@ -198,8 +221,35 @@ export function TeacherDashboardContent() {
       {/* Student Table */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
         <Card className="mb-8">
-          <CardHeader>
+          <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <CardTitle>Students Overview</CardTitle>
+            {uniqueSchools.length > 0 && (
+              <div className="flex items-center gap-2">
+                <School className="h-4 w-4 text-muted-foreground" />
+                <Select value={schoolFilter} onValueChange={setSchoolFilter}>
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="Filter by school" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Schools</SelectItem>
+                    {uniqueSchools.map((school) => (
+                      <SelectItem key={school} value={school}>
+                        {school}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {schoolFilter && schoolFilter !== "all" && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSchoolFilter("")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
+            )}
           </CardHeader>
           <CardContent>
             {isLoading ? (
@@ -208,17 +258,20 @@ export function TeacherDashboardContent() {
                   <Skeleton key={i} className="h-12 w-full" />
                 ))}
               </div>
-            ) : students.length === 0 ? (
+            ) : filteredStudents.length === 0 ? (
               <div className="py-8 text-center text-muted-foreground">
                 <Users className="mx-auto mb-3 h-12 w-12 opacity-50" />
-                <p className="font-medium">No students enrolled yet</p>
-                <p className="text-sm">Students will appear here once they sign up</p>
+                <p className="font-medium">No students found</p>
+                <p className="text-sm">
+                  {schoolFilter ? "Try clearing the school filter" : "Students will appear here once they sign up"}
+                </p>
               </div>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Student</TableHead>
+                    <TableHead>School</TableHead>
                     <TableHead>Sessions</TableHead>
                     <TableHead>Messages</TableHead>
                     <TableHead>Last Active</TableHead>
@@ -226,10 +279,20 @@ export function TeacherDashboardContent() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {students.map((student) => (
+                  {filteredStudents.map((student) => (
                     <TableRow key={student.user_id}>
                       <TableCell className="font-medium">
                         {student.display_name}
+                      </TableCell>
+                      <TableCell>
+                        {student.school_name ? (
+                          <Badge variant="outline" className="gap-1">
+                            <School className="h-3 w-3" />
+                            {student.school_name}
+                          </Badge>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
                       </TableCell>
                       <TableCell>
                         <Badge variant="secondary">{student.total_sessions}</Badge>
