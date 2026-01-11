@@ -1,73 +1,119 @@
-# Welcome to your Lovable project
+# 🎓 AutoVivaTutor (AI University Tutor)
 
-## Project info
+**Revolutionizing academic support with personalized, accessible, and intelligent AI tutoring.**
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+AutoVivaTutor is a modern, AI-powered educational platform designed to bridge the gap in university academic support. By leveraging advanced AI, real-time feedback, and personalized curriculum generation, it ensures every student has access to quality mentorship 24/7.
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## 🚩 Problem Statement
 
-**Use Lovable**
+University students face critical barriers in accessing personalized academic support due to limited tutor availability, high costs, and one-size-fits-all teaching approaches.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+* **Capacity Gaps:** Traditional human tutors can only manage 20-30 students weekly, creating 40% capacity gaps during peak academic seasons.
+* **High Costs:** Private tutoring costs $40-100 per hour, making quality support inaccessible for most students.
+* **Student Struggles:** Research shows 36.1% of students cannot study adequately due to work commitments, and 45.8% struggle with focus and concentration.
+* **Delayed Feedback:** Students wait 3-7 days for assignment feedback, significantly reducing learning retention and preventing timely course corrections.
 
-Changes made via Lovable will be committed automatically to this repo.
+These compounding barriers result in decreased motivation, higher dropout rates, and widening achievement gaps between students who can afford personalized help and those who cannot.
 
-**Use your preferred IDE**
+## 💡 Solution
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+**AI University Tutor** is an intelligent tutoring platform that leverages artificial intelligence and natural language processing to democratize education. It provides:
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+* **Instant Access:** 24/7 availability for queries, doubts, and learning support.
+* **Personalization:** Tailored course generation based on user goals (e.g., "Python for Data Science").
+* **Affordability:** Drastically reduces the cost barrier compared to human tutoring.
+* **Real-time Feedback:** Instant grading and suggestions to improve learning retention immediately.
 
-Follow these steps:
+---
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## ✨ Key Features
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### 🤖 AI-Powered Learning
+* **Smart Chat Assistant:** A conversational interface for real-time Q&A and doubt solving.
+* **Course Generator:** Create custom learning paths on any topic (e.g., Machine Learning, UI/UX) with a single click.
+* **Web-Augmented Knowledge:** Integrated **Firecrawl** search to fetch the latest academic resources and references.
 
-# Step 3: Install the necessary dependencies.
-npm i
+### 📊 Student Dashboard
+* **Progress Tracking:** Visual analytics of your learning activity and skill mastery using **Recharts**.
+* **Streak System:** Gamified learning with daily streaks to keep you motivated.
+* **Skill Mastery Charts:** Radar charts to visualize strengths and areas for improvement.
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+### 🍎 Teacher & Admin Tools
+* **Role-Based Access:** Dedicated dashboards for Teachers to oversee content and Student progress.
+* **Curriculum Management:** Tools for educators to create and manage structured courses.
 
-**Edit a file directly in GitHub**
+### 🛡️ Secure & Modern Architecture
+* **Authentication:** Secure Login/Signup via **Supabase Auth**.
+* **Protected Routes:** Role-based route protection to ensure data privacy.
+* **Responsive Design:** Fully mobile-responsive UI built with **Tailwind CSS** and **Shadcn UI**.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+---
 
-**Use GitHub Codespaces**
+## 🛠️ Tech Stack
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+**Frontend:**
+* **Core:** React, TypeScript, Vite
+* **Styling:** Tailwind CSS, Shadcn UI, Lucide React (Icons)
+* **State & Query:** TanStack Query, React Router DOM
+* **Visualizations:** Recharts, Mermaid.js
+* **Animations:** Framer Motion
 
-## What technologies are used for this project?
+**Backend & Services:**
+* **BaaS:** Supabase (Database, Auth, Edge Functions)
+* **AI & Search:** OpenAI (via Edge Functions), Firecrawl (Web Scraping/Search)
 
-This project is built with:
+---
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🚀 Getting Started
 
-## How can I deploy this project?
+Follow these steps to set up the project locally.
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+### Prerequisites
+* Node.js (v18 or higher)
+* npm or bun
+* Git
 
-## Can I connect a custom domain to my Lovable project?
+### Installation
 
-Yes, you can!
+1.  **Clone the repository**
+    ```bash
+    git clone [https://github.com/manthan-darji/autovivatutor.git](https://github.com/manthan-darji/autovivatutor.git)
+    cd autovivatutor
+    ```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+2.  **Install dependencies**
+    ```bash
+    npm install
+    # or
+    bun install
+    ```
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+3.  **Environment Setup**
+    Create a `.env` file in the root directory and add your keys:
+    ```env
+    VITE_SUPABASE_URL=your_supabase_project_url
+    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+    ```
+
+4.  **Run the development server**
+    ```bash
+    npm run dev
+    ```
+
+5.  **Open the App**
+    Visit `http://localhost:8080` to view the application.
+
+---
+
+## 📂 Project Structure
+
+src/ ├── components/ # Reusable UI components (Shadcn, Custom) ├── contexts/ # React Contexts (AuthContext) ├── hooks/ # Custom hooks (useChat, useAuth) ├── integrations/ # Third-party integrations (Supabase) ├── lib/ # Utilities and API wrappers (Firecrawl) ├── pages/ # Main Application Pages (Chat, CreateCourse, Index) ├── services/ # Business logic services └── supabase/ # Edge functions and database migrations
+
+
+---
+
+## 📄 License
+
+Distributed under the MIT License.
