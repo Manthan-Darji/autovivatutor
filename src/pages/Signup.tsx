@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -6,11 +6,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { GraduationCap, Loader2, Users, BookOpen, School } from "lucide-react";
+import { GraduationCap, Loader2, Users, BookOpen, School, Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 
 type AppRole = "teacher" | "student";
+
+interface PasswordRequirement {
+  label: string;
+  test: (password: string) => boolean;
+}
+
+const passwordRequirements: PasswordRequirement[] = [
+  { label: "At least 8 characters", test: (p) => p.length >= 8 },
+  { label: "Contains a number", test: (p) => /\d/.test(p) },
+  { label: "Contains a special character (!@#$%^&*)", test: (p) => /[!@#$%^&*(),.?":{}|<>]/.test(p) },
+];
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -23,8 +34,27 @@ export default function Signup() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const passwordValidation = useMemo(() => {
+    return passwordRequirements.map((req) => ({
+      ...req,
+      met: req.test(password),
+    }));
+  }, [password]);
+
+  const isPasswordValid = passwordValidation.every((req) => req.met);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!isPasswordValid) {
+      toast({
+        title: "Invalid password",
+        description: "Please meet all password requirements.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsLoading(true);
 
     try {
@@ -144,8 +174,27 @@ export default function Signup() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                minLength={6}
               />
+              {password.length > 0 && (
+                <div className="mt-2 space-y-1.5 rounded-lg border border-border bg-muted/30 p-3">
+                  {passwordValidation.map((req, index) => (
+                    <div
+                      key={index}
+                      className={cn(
+                        "flex items-center gap-2 text-sm transition-colors",
+                        req.met ? "text-green-500" : "text-muted-foreground"
+                      )}
+                    >
+                      {req.met ? (
+                        <Check className="h-4 w-4" />
+                      ) : (
+                        <X className="h-4 w-4" />
+                      )}
+                      <span>{req.label}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <Button type="submit" className="w-full" disabled={isLoading}>
