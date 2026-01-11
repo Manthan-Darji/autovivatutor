@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 export interface ChatSession {
   id: string;
@@ -10,14 +11,22 @@ export interface ChatSession {
   last_message_at: string | null;
   created_at: string;
   updated_at: string;
+  user_id: string | null;
 }
 
 export function useChatSessions() {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
   const fetchSessions = useCallback(async () => {
+    if (!user) {
+      setSessions([]);
+      setIsLoading(false);
+      return;
+    }
+
     try {
       setIsLoading(true);
       const { data, error } = await supabase
@@ -32,9 +41,11 @@ export function useChatSessions() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [user]);
 
   const createSession = useCallback(async (title: string = "New Chat") => {
+    if (!user) throw new Error("Must be logged in to create a session");
+
     const emojis = ["💬", "📚", "🎓", "💡", "🧠", "📖", "✨", "🚀"];
     const colors = [
       "from-indigo-500/20 to-purple-500/20",
@@ -50,6 +61,7 @@ export function useChatSessions() {
         title,
         emoji: emojis[Math.floor(Math.random() * emojis.length)],
         color: colors[Math.floor(Math.random() * colors.length)],
+        user_id: user.id,
       })
       .select()
       .single();
@@ -58,7 +70,7 @@ export function useChatSessions() {
     
     setSessions((prev) => [data, ...prev]);
     return data;
-  }, []);
+  }, [user]);
 
   const updateSessionTitle = useCallback(async (sessionId: string, title: string) => {
     const { error } = await supabase
