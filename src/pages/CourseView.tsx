@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { 
@@ -20,7 +20,7 @@ import {
   Layers
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -269,9 +269,20 @@ const courseData: Record<string, CourseData> = {
 const CourseView = () => {
   const navigate = useNavigate();
   const { courseId } = useParams();
+  const [searchParams] = useSearchParams();
   const [expandedModules, setExpandedModules] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState("modules");
   
   const course = courseId ? courseData[courseId] : null;
+  
+  // Read tab from URL params
+  useEffect(() => {
+    const tabParam = searchParams.get("tab");
+    if (tabParam && ["modules", "syllabus", "resources"].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams]);
+  
 
   const toggleModule = (moduleId: string) => {
     setExpandedModules(prev => 
@@ -382,7 +393,7 @@ const CourseView = () => {
           </motion.div>
 
           {/* Tabs for Content, Syllabus, Resources */}
-          <Tabs defaultValue="modules" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="mb-6 w-full justify-start bg-card border border-border">
               <TabsTrigger value="modules" className="gap-2">
                 <Layers className="h-4 w-4" />
