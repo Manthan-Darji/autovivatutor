@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Chat from "./pages/Chat";
 import ChatHistory from "./pages/ChatHistory";
 import MyCourses from "./pages/MyCourses";
+import CourseView from "./pages/CourseView";
 import CreateCourse from "./pages/CreateCourse";
 import Settings from "./pages/Settings";
 import Login from "./pages/Login";
@@ -48,6 +49,11 @@ const App = () => (
             <Route path="/courses" element={
               <ProtectedRoute>
                 <MyCourses />
+              </ProtectedRoute>
+            } />
+            <Route path="/course/:courseId" element={
+              <ProtectedRoute>
+                <CourseView />
               </ProtectedRoute>
             } />
             <Route path="/create" element={
