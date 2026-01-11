@@ -119,6 +119,7 @@ const MyCourses = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
+                  onClick={() => navigate(`/course/${course.id}`)}
                   className={`group relative cursor-pointer overflow-hidden rounded-xl border border-border bg-gradient-to-br ${course.color} p-6 backdrop-blur-sm transition-all hover:border-primary/50 hover:shadow-lg`}
                 >
                   <div className="flex items-start gap-4">
@@ -161,9 +162,9 @@ const MyCourses = () => {
                     <Button
                       variant="secondary"
                       size="sm"
-                      className="gap-1.5 opacity-0 transition-opacity group-hover:opacity-100"
+                      className="gap-1.5"
                     >
-                      Continue
+                      View Course
                       <ArrowRight className="h-3.5 w-3.5" />
                     </Button>
                   </div>
