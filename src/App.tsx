@@ -12,7 +12,6 @@ import CreateCourse from "./pages/CreateCourse";
 import Settings from "./pages/Settings";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import TeacherDashboard from "./pages/TeacherDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -53,13 +52,6 @@ const App = () => (
             <Route path="/settings" element={
               <ProtectedRoute>
                 <Settings />
-              </ProtectedRoute>
-            } />
-            
-            {/* Teacher-only route */}
-            <Route path="/teacher" element={
-              <ProtectedRoute allowedRoles={["teacher"]}>
-                <TeacherDashboard />
               </ProtectedRoute>
             } />
             

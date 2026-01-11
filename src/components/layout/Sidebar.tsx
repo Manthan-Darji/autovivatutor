@@ -1,4 +1,4 @@
-import { LayoutDashboard, BookOpen, PlusCircle, Settings, LogOut, GraduationCap } from "lucide-react";
+import { LayoutDashboard, BookOpen, PlusCircle, Settings, LogOut } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -8,14 +8,12 @@ interface NavItem {
   icon: React.ComponentType<{ className?: string }>;
   label: string;
   path: string;
-  roles?: ("teacher" | "student")[];
 }
 
 const navItems: NavItem[] = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
   { icon: BookOpen, label: "My Courses", path: "/courses" },
   { icon: PlusCircle, label: "Create Course", path: "/create" },
-  { icon: GraduationCap, label: "Students", path: "/teacher", roles: ["teacher"] },
 ];
 
 const bottomItems: NavItem[] = [
@@ -28,7 +26,7 @@ interface SidebarProps {
 
 export function Sidebar({ activePath = "/" }: SidebarProps) {
   const navigate = useNavigate();
-  const { signOut, role } = useAuth();
+  const { signOut } = useAuth();
 
   const handleLogout = async () => {
     try {
@@ -39,11 +37,6 @@ export function Sidebar({ activePath = "/" }: SidebarProps) {
       toast.error("Failed to log out");
     }
   };
-
-  // Filter nav items based on role
-  const filteredNavItems = navItems.filter(
-    (item) => !item.roles || (role && item.roles.includes(role))
-  );
 
   return (
     <motion.aside
@@ -60,9 +53,8 @@ export function Sidebar({ activePath = "/" }: SidebarProps) {
         <span className="text-lg font-semibold text-sidebar-accent-foreground">Viva Tutor</span>
       </div>
 
-      {/* Main Navigation */}
       <nav className="flex-1 space-y-1 px-3">
-        {filteredNavItems.map((item) => (
+        {navItems.map((item) => (
           <NavButton 
             key={item.label} 
             item={item} 
