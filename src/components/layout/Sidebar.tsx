@@ -8,12 +8,13 @@ interface NavItem {
   icon: React.ComponentType<{ className?: string }>;
   label: string;
   path: string;
+  teacherOnly?: boolean;
 }
 
 const navItems: NavItem[] = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
   { icon: BookOpen, label: "My Courses", path: "/courses" },
-  { icon: PlusCircle, label: "Create Course", path: "/create" },
+  { icon: PlusCircle, label: "Create Course", path: "/create", teacherOnly: true },
 ];
 
 const bottomItems: NavItem[] = [
@@ -26,7 +27,12 @@ interface SidebarProps {
 
 export function Sidebar({ activePath = "/" }: SidebarProps) {
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { signOut, role } = useAuth();
+
+  // Filter nav items based on role
+  const filteredNavItems = navItems.filter(
+    (item) => !item.teacherOnly || role === "teacher"
+  );
 
   const handleLogout = async () => {
     try {
@@ -54,7 +60,7 @@ export function Sidebar({ activePath = "/" }: SidebarProps) {
       </div>
 
       <nav className="flex-1 space-y-1 px-3">
-        {navItems.map((item) => (
+        {filteredNavItems.map((item) => (
           <NavButton 
             key={item.label} 
             item={item} 
