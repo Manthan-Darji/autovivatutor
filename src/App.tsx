@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Chat from "./pages/Chat";
+import ChatHistory from "./pages/ChatHistory";
 import MyCourses from "./pages/MyCourses";
 import CreateCourse from "./pages/CreateCourse";
 import Settings from "./pages/Settings";
@@ -37,6 +38,11 @@ const App = () => (
             <Route path="/chat" element={
               <ProtectedRoute>
                 <Chat />
+              </ProtectedRoute>
+            } />
+            <Route path="/chat-history" element={
+              <ProtectedRoute>
+                <ChatHistory />
               </ProtectedRoute>
             } />
             <Route path="/courses" element={
