@@ -203,7 +203,7 @@ export default function Signup() {
                   type="button"
                   onClick={() => setRole("student")}
                   className={cn(
-                    "flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all",
+                    "flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all text-center",
                     role === "student"
                       ? "border-primary bg-primary/10 text-primary"
                       : "border-border bg-muted/30 text-muted-foreground hover:border-primary/50"
@@ -211,12 +211,15 @@ export default function Signup() {
                 >
                   <BookOpen className="h-6 w-6" />
                   <span className="font-medium">Student</span>
+                  <span className="text-[10px] leading-tight opacity-70">
+                    Learn, practice & ask doubts
+                  </span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setRole("teacher")}
                   className={cn(
-                    "flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all",
+                    "flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all text-center",
                     role === "teacher"
                       ? "border-primary bg-primary/10 text-primary"
                       : "border-border bg-muted/30 text-muted-foreground hover:border-primary/50"
@@ -224,6 +227,9 @@ export default function Signup() {
                 >
                   <Users className="h-6 w-6" />
                   <span className="font-medium">Teacher</span>
+                  <span className="text-[10px] leading-tight opacity-70">
+                    Create courses & track students
+                  </span>
                 </button>
               </div>
             </div>
